@@ -1,0 +1,29 @@
+- name: Install squid
+  yum:
+    name: squid
+    state: installed
+
+- name: Add permitted ips to squid.conf
+  lineinfile:
+    backup: yes
+    path: /etc/squid/squid.conf
+    state: present
+    line: 'acl permittedips src {{ item }}'
+  with_items:
+  - "{{ permitted_ips }}"
+
+- name: Allow http access to permitted ips
+  lineinfile:
+    backup: yes
+    path: /etc/squid/squid.conf
+    state: present
+    line: 'http_access allow permittedips'
+
+- name: Start squid proxy
+  service: 
+    name: squid
+    state: started
+    enabled: yes
+
+- debug:
+    msg: "Logs are available at /var/log/squid"
