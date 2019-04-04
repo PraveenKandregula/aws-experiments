@@ -10,7 +10,7 @@
     state: present
     line: 'acl permittedips src {{ item }}'
   with_items:
-  - "{{ permitted_ips }}"
+  - "{{ permitted_ips.split(',') }}"
 
 - name: Allow http access to permitted ips
   lineinfile:
