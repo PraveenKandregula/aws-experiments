@@ -1,0 +1,49 @@
+- name: Spin up new EC2 instance
+  ec2:
+    aws_access_key: "{{ access_key }}"
+    aws_secret_key: "{{ secret_key }}"
+    count: 1
+    #id: ami_instance1
+    image: "{{ image_id }}"
+    instance_type: "{{ instance_type }}"
+    key_name: "{{ key_name }}" 
+    region: "{{ region }}"
+    state: present
+    user_data: |
+                #!/bin/sh
+                yum install telnet -y
+                yum install tree -y
+    wait: yes
+  register: ami_instance
+
+- debug:
+    msg: "{{ ami_instance.instance_ids }}"
+
+- name: Wait for 3 minutes for user data to complete
+  pause:
+    minutes: 3
+
+- name: Create custom AMI from new instance
+  ec2_ami:
+    aws_access_key: "{{ access_key }}"
+    aws_secret_key: "{{ secret_key }}"
+    instance_id: "{{ item }}"
+    region: "{{ region }}"
+    state: present
+    wait: yes
+    name: custom-ami
+  with_items:
+  - "{{ ami_instance.instance_ids }}"
+  register: ami_id
+
+- debug:
+    msg: "New ami_id: {{ ami_id }}"
+
+- name: "Terminate ec2_instance"
+  ec2:
+    aws_access_key: "{{ access_key }}"
+    aws_secret_key: "{{ secret_key }}"
+    instance_ids: "{{ ami_instance.instance_ids }}"
+    region: "{{ region }}"
+    state: absent
+    wait: yes

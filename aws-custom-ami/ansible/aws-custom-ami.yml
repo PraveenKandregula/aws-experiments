@@ -1,0 +1,6 @@
+- hosts: localhost
+  vars_files: 
+  - ../../keys.yml
+  - vars/env.yml
+  roles:
+  - custom-ami

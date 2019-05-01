@@ -1,0 +1,6 @@
+Run playbook in below format
+ansible-playbook aws-custom-ami.yml --vault-password-file /tmp/vault-password
+
+keys.yml will have below keys
+access_key: 
+secret_key: 
